@@ -1,0 +1,28 @@
+name: Docker build & Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+
+      - name: Build Docker image
+        run: docker build -t erickromo/monodocker:${{ github.sha }} .
+
+      - name: Tag Latest
+        run: docker tag erickromo/monodocker:${{ github.sha }} erickromo/monodocker:latest
+
+      - name: Push Docker image
+        run: |
+          docker push erickromo/monodocker:${{ github.sha }}
+          docker push erickromo/monodocker:latest
